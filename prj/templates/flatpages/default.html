@@ -1,0 +1,146 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Django flatpages — {% block title %} {% endblock title %}</title>
+
+
+  <!-- Bootstrap core CSS -->
+  <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Django flatpages</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/contacts/">Contact</a>
+          </li>
+           <li class="nav-item">
+            <a class="nav-link" href="/app/default?">Products</a>
+          </li>
+            <li class="nav-item">
+            <a class="nav-link" href="/app/create/">Add Product</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+{% block content %}
+<form method="get">
+    {{filter.form.as_p}}
+    <input type="submit" value="Найти">
+</form>
+
+<table>
+
+    <thead>
+        <th>
+            Name
+        </th>
+        <th>
+            Category
+        </th>
+        <th>
+            Price
+        </th>
+        <th>
+            Quantity
+        </th>
+    </thead>
+    {% for product in filter.qs %} <!-- поменяем products на filter.qs, т.к. теперь мы забираем уже отобранную по каким-то параметрам информацию -->
+    <tr>
+        <td>
+            <a href="{% url 'product_detail' product.id %}">{{ product.name|title }}</a> <!-- При нажатии на имя товара в таблцие нас теперь будет перекидывать на страницу с самого товара -->
+            <a href="{% url 'product_update' product.id %}"><u>Редактировать</u></a> <!-- добавим ссылку на редактирование товара-->
+
+            <a href="{% url 'product_delete' product.id %}"><u> Удалить </u></a> <!-- добавим ссылку на удаление товара-->
+        </td>
+        <td>
+            {{ product.category.name|title }}
+        </td>
+        <td>
+            {{ product.price }}
+        </td>
+        <td>
+            {{ product.quantity }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'product_create' %}">Добавить новый товар</a> <br>
+
+
+{% if is_paginated %}
+
+    {% if page_obj.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a>{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+{% endif %}
+<br>
+
+{%endblock content%}
+
+
+<!-- Название у нас будет proudcts -->
+
+
+<!-- В контенте на странице мы выводим все товары -->
+
+
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="{% static 'vendor/jquery/jquery.slim.min.js' %}"></script>
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+</body>
+
+</html>
